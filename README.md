@@ -1,6 +1,6 @@
 # Bootcamp Backend con Python V2
 Material de las clases del Bootcamp de Backend con Python V2 de Código Facilito.
-- Clase 2 - Conceptos de Python para el Backend.
+- Clase 1 - Conceptos de Python para el Backend.
 - Clase 7 - Introducción a Flask.
 - Clase 8 - Base de datos con Flask.
 - Clase 16 - Serialización con Django.
@@ -20,4 +20,4 @@ jupyter notebook
 
 ## Diapositivas:
 
-- Clase 2 - [Conceptos de Python para el Backend.](https://docs.google.com/presentation/d/1w1yAoIH2Mxdm8LfSI-daq27qimhVq5Pzxji997L-UV4/edit?usp=sharing)
+- Clase 1 - [Conceptos de Python para el Backend.](https://docs.google.com/presentation/d/1w1yAoIH2Mxdm8LfSI-daq27qimhVq5Pzxji997L-UV4/edit?usp=sharing)
