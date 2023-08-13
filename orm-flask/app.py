@@ -1,6 +1,6 @@
 from os import environ
 
-from flask import Flask, render_template, request, session, redirect
+from flask import Flask, render_template, request, session, redirect, url_for
 
 from database import User, Product
 
@@ -30,7 +30,7 @@ def register():
             user = User.create_user(username, password)  # INSERT
             session["user_id"] = user.id  # ID del usuario en la base de datos
 
-            return redirect("/products")
+            return redirect(url_for("products"))
 
     return render_template("register.html")
 
@@ -57,13 +57,13 @@ def products_create():
 
             # INSERT INTO products(name, price, user_id) VALUES (name, price, user_id)
             Product.create(name=name, price=price, user=user)
-            return redirect("/products")
+            return redirect(url_for("products"))
 
     return render_template("products/create.html")
 
 
 @app.route("/products/update/<id>", methods=["GET", "POST"])
-def products_update(id):
+def products_update(id:int):
     _product = Product.select().where(Product.id == id).first()
 
     if request.method == "POST":
@@ -71,7 +71,7 @@ def products_update(id):
         _product.price = request.form.get("price")
         _product.save()  # UPDATE products SET name="" 
 
-        return redirect("/products")
+        return redirect(url_for("products"))
 
     return render_template("products/update.html", product=_product)
 

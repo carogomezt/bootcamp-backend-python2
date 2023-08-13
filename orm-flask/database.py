@@ -38,7 +38,7 @@ class Product(Model):  # Tables
 
     @property
     def price_format(self):
-        return f"$ {self.price} dólares"
+        return f"$ {self.price} dollars"
 
     class Meta:
         database = db

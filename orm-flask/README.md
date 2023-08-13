@@ -20,7 +20,7 @@ pip install -r requirements.txt
 ```
 5. Copia las variables de entorno:
 ```commandline
-cp .env.example.env
+cp .env.example .env
 ```
 6. Conectate en una nueva terminal y abre la consola de MySQL:
 ```
