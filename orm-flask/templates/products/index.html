@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Page title</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    <script src="js/main.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="antialiased bg-body text-body font-body">
+    <div class="">
+
+        <section class="relative py-20">
+            <div class="container px-4 mx-auto">
+                <div class="max-w-3xl mb-20 mx-auto text-center">
+                    <span class="text-xs text-blue-400 font-semibold"><a href="/products/create">Nuevo producto</a></span>
+                    <h2 class="mt-8 mb-10 text-4xl font-semibold font-heading">Listado de productos</h2>
+                </div>
+                <div class="flex flex-wrap -m-3 mb-16">
+
+                    {% for product in products %}
+                        <div class="w-full md:w-1/2 lg:w-1/3 p-3">
+                            <div class="p-6 border rounded-xl">
+                            <div class="relative h-52 mb-6">
+                                <span class="absolute top-0 right-0 mt-4 mr-4 text-xs text-white px-2 py-1 font-semibold bg-gray-600 bg-opacity-50 rounded-md uppercase">Categoria</span>
+                                <img class="w-full h-full object-cover rounded-lg"
+                                    src="https://images-codigofacilito.s3.us-west-1.amazonaws.com/images/thumb_default.jpg"
+                                    alt=""
+                                >
+                            </div>
+                            <span class="inline-block mb-4 text-xs text-gray-500">{{ product.created_at }}</span>
+                            <h2 class="mb-4 text-2xl font-semibold font-heading">{{ product.name }}</h2>
+                            <p class="mb-4 text-gray-500 leading-relaxed">{{ product.price_format }} </p>
+                            <a class="text-lg font-medium text-yellow-500 underline hover:no-underline" href="/products/update/{{ product.id }}">Editar</a>
+                            <a class="text-lg font-medium text-red-500 underline hover:no-underline" href="#">Eliminar</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                </div>
+            </div>
+        </section>
+
+    </div>
+</body>
+</html>
