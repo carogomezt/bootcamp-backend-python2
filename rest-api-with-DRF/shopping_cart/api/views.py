@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import CartItem
-from .serializer import CartItemSerializer
+from .serializers import CartItemSerializer
 
 
 # Create your views here.
