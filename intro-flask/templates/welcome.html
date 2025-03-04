@@ -7,12 +7,16 @@
   </head>
   <body>
     <div class="container">
-      <h1>Welcome to Flask!</h2>
-      <br>
-      <p>Click <a href="/">here</a> to go home.</p>
-      {% for message in get_flashed_messages() %}
-        {{ message }}
-      {% endfor %}
+      <div class="row mt-4 p-2">
+        <h1>Welcome to Flask!</h2>
+        <br>
+        <p>Click <a href="/">here</a> to go home.</p>
+        {% for message in get_flashed_messages() %}
+          <div class="alert alert-primary" role="alert">
+            {{ message }}
+          </div>
+        {% endfor %}
+        </div>
     </div>
   </body>
 
