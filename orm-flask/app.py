@@ -34,6 +34,24 @@ def register():
 
     return render_template("register.html")
 
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form.get("username")  # None
+        password = request.form.get("password")
+
+        user = User.select().where(User.username == username & User.password == password).first()
+        if user:
+            session["user_id"] = user.id
+            return redirect(url_for("products"))
+
+    return render_template("login.html")
+
+@app.route("/logout")
+def logout():
+    session["user_id"] = None
+    return render_template("login.html")
+
 
 @app.route("/products")
 def products():
