@@ -51,22 +51,8 @@ python manage.py createsuperuser
 ```
 python manage.py runserver
 ```
-10. Para probar nuestra REST API vamos a usar Postman para hacer peticiones a nuestra API, descargala [aquí.](https://www.postman.com/downloads/)
-11. Ejemplo de peticion para agregar productos:
-```commandline
-curl -X POST -H "Content-Type: application/json" http://127.0.0.1:8000/cart-items/ -d "{\"product_name\":\"name\",\"product_price\":\"41\",\"product_quantity\":\"1\"}"
-```
-12. Ejemplo de peticion para obtener productos:
-```commandline
-curl -X GET http://127.0.0.1:8000/cart-items/
-```
-13. Ejemplo de peticion para modificar productos:
-```commandline
-curl -X PATCH http://127.0.0.1:8000/update-item/1 -H "Content-Type: application/json" -d "{\"product_quantity\":\"3\"}"
-```
-14. Ejemplo de peticion para borrar un producto:
-```commandline
-curl -X "DELETE" http://127.0.0.1:8000/update-item/1
-```
+### Probando nuestra API
 
-_Ejemplo tomado de: [Creating a REST API in Python with Django](https://stackabuse.com/creating-a-rest-api-in-python-with-django/)_
+Para probar nuestra REST API vamos a usar Postman para hacer peticiones a nuestra API, descargala [aquí.](https://www.postman.com/downloads/)
+
+Abre postman e importa la colección que esta en el repositorio.

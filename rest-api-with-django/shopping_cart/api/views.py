@@ -3,76 +3,141 @@ import json
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views import View
+from django.forms.models import model_to_dict
 from django.views.decorators.csrf import csrf_exempt
 
-from .models import CartItem
+from .models import Product, Cart, CartItem
 
 
-# Create your views here.
-# Agregamos este decorador para evitar problemas por Cross Site Request Forgery Attacks (CSRF)
-@method_decorator(csrf_exempt, name='dispatch')
-class ShoppingCart(View):
-    def post(self, request):
-
-        data = json.loads(request.body.decode("utf-8"))
-        p_name = data.get('product_name')
-        p_price = data.get('product_price')
-        p_quantity = data.get('product_quantity')
-
-        product_data = {
-            'product_name': p_name,
-            'product_price': p_price,
-            'product_quantity': p_quantity,
-        }
-
-        cart_item = CartItem.objects.create(**product_data)
-
-        data = {
-            "message": f"New item added to Cart with id: {cart_item.id}"
-        }
-        return JsonResponse(data, status=201)
-
+class ProductListView(View):
     def get(self, request):
-        items_count = CartItem.objects.count()
-        items = CartItem.objects.all()
+        products = Product.objects.all()
+        data = [model_to_dict(p) for p in products]
+        return JsonResponse(data, safe=False)
+
+
+class CartDetailView(View):
+    def get(self, request, id):
+        try:
+            cart = Cart.objects.get(id=id)
+        except Cart.DoesNotExist:
+            return JsonResponse({"error": "Cart not found"}, status=404)
 
         items_data = []
-        for item in items:
-            items_data.append({
-                'product_name': item.product_name,
-                'product_price': item.product_price,
-                'product_quantity': item.product_quantity,
-            })
+        for item in cart.items.select_related("product"):
+            items_data.append(
+                {
+                    "product": item.product.name,
+                    "price": float(item.product.price),
+                    "quantity": item.quantity,
+                    "total_price": float(item.total_price()),
+                }
+            )
 
-        data = {
-            'items': items_data,
-            'count': items_count,
+        cart_data = {
+            "id": cart.id,
+            "created_at": cart.created_at,
+            "total": cart.total(),
+            "items": items_data,
         }
+        return JsonResponse(cart_data, safe=False)
 
-        return JsonResponse(data)
 
+# Agregamos este decorador para evitar problemas por Cross Site Request Forgery Attacks (CSRF)
+@method_decorator(csrf_exempt, name="dispatch")
+class CartItemCreateView(View):
+    def post(self, request, id):
+        try:
+            cart = Cart.objects.get(id=id)
+        except Cart.DoesNotExist:
+            return JsonResponse({"error": "Cart not found"}, status=404)
 
-@method_decorator(csrf_exempt, name='dispatch')
-class ShoppingCartUpdate(View):
+        try:
+            data = json.loads(request.body.decode("utf-8"))
+            product_id = data.get("product_id")
+            quantity = int(data.get("quantity", 1))
+        except (KeyError, ValueError, json.JSONDecodeError):
+            return JsonResponse({"error": "Invalid input"}, status=400)
 
-    def patch(self, request, item_id):
-        data = json.loads(request.body.decode("utf-8"))
-        item = CartItem.objects.get(id=item_id)
-        item.product_quantity = data['product_quantity']
+        try:
+            product = Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+            return JsonResponse({"error": "Product not found"}, status=404)
+
+        item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+        if not created:
+            item.quantity += quantity
+        else:
+            item.quantity = quantity
         item.save()
 
-        data = {
-            'message': f'Item {item_id} has been updated'
-        }
+        return JsonResponse(
+            {
+                "message": "Product added to cart",
+                "cart_id": cart.id,
+                "product": product.name,
+                "quantity": item.quantity,
+            }
+        )
 
-        return JsonResponse(data)
 
-    def delete(self, request, item_id):
-        item = CartItem.objects.get(id=item_id)
-        item.delete()
+@method_decorator(csrf_exempt, name="dispatch")
+class CartItemUpdateView(View):
+    def patch(self, request, id):
+        try:
+            cart = Cart.objects.get(id=id)
+        except Cart.DoesNotExist:
+            return JsonResponse({"error": "Cart not found"}, status=404)
 
-        data = {
-            'message': f'Item {item_id} has been deleted'
-        }
+        try:
+            data = json.loads(request.body.decode("utf-8"))
+            product_id = data.get("product_id")
+            quantity = int(data.get("quantity", 1))
+        except (KeyError, ValueError, json.JSONDecodeError):
+            return JsonResponse({"error": "Invalid input"}, status=400)
 
-        return JsonResponse(data)
+        try:
+            product = Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+            return JsonResponse({"error": "Product not found"}, status=404)
+
+        cart_item = CartItem.objects.get(cart=cart, product=product)
+        cart_item.quantity = quantity
+
+        cart_item.save()
+
+        return JsonResponse(
+            {
+                "message": "Product updated in the cart",
+                "cart_id": cart.id,
+                "product": product.name,
+                "quantity": cart_item.quantity,
+            }
+        )
+
+    def delete(self, request, id):
+        try:
+            cart = Cart.objects.get(id=id)
+        except Cart.DoesNotExist:
+            return JsonResponse({"error": "Cart not found"}, status=404)
+
+        try:
+            data = json.loads(request.body.decode("utf-8"))
+            product_id = data.get("product_id")
+        except (KeyError, ValueError, json.JSONDecodeError):
+            return JsonResponse({"error": "Invalid input"}, status=400)
+
+        try:
+            product = Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+            return JsonResponse({"error": "Product not found"}, status=404)
+
+        cart_item = CartItem.objects.get(cart=cart, product=product)
+
+        cart_item.delete()
+
+        return JsonResponse(
+            {
+                "message": "Card Item has been deleted",
+            }
+        )
