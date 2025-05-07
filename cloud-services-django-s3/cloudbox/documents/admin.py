@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from .models import Document
-from .utils import generate_presigned_url
+from .utils import generate_custom_presigned_url
 
 
 # Register your models here.
@@ -10,7 +10,7 @@ class DocumentAdmin(admin.ModelAdmin):
 
     def file_link(self, obj):
         if obj.file:
-            url = generate_presigned_url(obj.file.name)
+            url = generate_custom_presigned_url(obj.file.name)
             return format_html('<a href="{}" target="_blank">Download</a>', url)
         return "-"
 

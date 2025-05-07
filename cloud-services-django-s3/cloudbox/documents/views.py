@@ -5,7 +5,7 @@ from django.views import View
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from .models import Document
-from .utils import generate_presigned_url
+from .utils import generate_custom_presigned_url
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 
@@ -20,7 +20,7 @@ class UploadDocumentView(View):
             return JsonResponse({"error": "File and title are required"}, status=400)
 
         document = Document.objects.create(title=title, file=file)
-        file_url = generate_presigned_url(document.file.name)
+        file_url = generate_custom_presigned_url(document.file.name)
         return JsonResponse(
             {
                 "id": document.id,
@@ -37,11 +37,12 @@ class ListDocumentsView(View):
         documents = Document.objects.all()
         data = []
         for doc in documents:
-            file_url = generate_presigned_url(doc.file.name)
+            file_url = generate_custom_presigned_url(doc.file.name)
             data.append(
                 {
                     "id": doc.id,
                     "title": doc.title,
+                    "original_url": doc.file.url,
                     "file_url": file_url,
                     "uploaded_at": doc.uploaded_at,
                 }
@@ -52,7 +53,7 @@ class ListDocumentsView(View):
 class DownloadDocumentView(View):
     def get(self, request, id):
         document = get_object_or_404(Document, id=id)
-        file_url = generate_presigned_url(document.file.name)
+        file_url = generate_custom_presigned_url(document.file.name)
         if not file_url:
             return JsonResponse({"error": "Could not generate URL"}, status=500)
         return JsonResponse({"url": file_url})
